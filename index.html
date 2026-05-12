@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ Chăm Sóc Hậu Phẫu ERAS Nhi</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
+        .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #0056b3; font-size: 20px; margin-bottom: 5px; }
+        h3 { text-align: center; color: #333; margin-top: 0; font-size: 16px; }
+        label { font-weight: bold; margin-top: 10px; display: block; }
+        input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #218838; }
+        .result { margin-top: 20px; }
+        .card { background: #e9ecef; padding: 15px; margin-bottom: 15px; border-left: 5px solid #0056b3; border-radius: 5px; }
+        .time { font-size: 16px; font-weight: bold; color: #d9534f; }
+        .title { font-size: 16px; font-weight: bold; margin: 8px 0; }
+        .details { margin: 5px 0; font-size: 14px; }
+        .criteria-fail { font-size: 13px; color: #721c24; background: #f8d7da; padding: 8px; border-radius: 3px; display: block; margin-top: 8px; line-height: 1.4; }
+        .criteria-success { font-size: 13px; color: #155724; background: #d4edda; padding: 8px; border-radius: 3px; display: block; margin-top: 5px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>⏱ CHĂM SÓC BỆNH NHI PHẪU THUẬT NỘI SOI<br>VIÊM RUỘT THỪA CÓ BIẾN CHỨNG</h2>
+    <h3>KHOA NGOẠI TỔNG HỢP - BỆNH VIỆN NHI ĐỒNG 2</h3>
+
+    <label for="time">Giờ tiếp nhận bệnh nhi tại Khoa (Giờ 0)</label>
+    <input type="datetime-local" id="time" required>
+
+    <label for="weight">Cân nặng của bệnh nhi (kg)</label>
+    <input type="number" id="weight" placeholder="Nhập cân nặng..." required step="0.1">
+
+    <button onclick="calculateERAS()">TẠO KẾ HOẠCH CHĂM SÓC</button>
+
+    <div class="result" id="result-container" style="display: none;">
+        <h3 style="text-align: center; color: #0056b3; margin-top: 10px;">LỊCH TRÌNH THEO DÕI</h3>
+        <div id="output"></div>
+    </div>
+</div>
+
+<script>
+    function addHours(date, hours) {
+        let newDate = new Date(date.getTime());
+        newDate.setHours(newDate.getHours() + hours);
+        return newDate.toLocaleString('vi-VN', { hour: '2-digit', minute:'2-digit', day: '2-digit', month: '2-digit' });
+    }
+
+    function calculateERAS() {
+        const timeInput = document.getElementById('time').value;
+        const weightInput = parseFloat(document.getElementById('weight').value);
+
+        if (!timeInput || !weightInput || weightInput <= 0) {
+            alert('Vui lòng nhập đầy đủ giờ tiếp nhận và cân nặng hợp lệ!');
+            return;
+        }
+
+        const baseTime = new Date(timeInput);
+        const outputDiv = document.getElementById('output');
+        outputDiv.innerHTML = '';
+
+        const steps = [
+            {
+                hour: 4,
+                title: 'TẬP NGỒI DẬY TẠI GIƯỜNG',
+                details: 'Đỡ bé ngồi dậy, có thể đong đưa chân bên thành giường (10-15 phút).',
+                criteria1: '<b>Không đạt:</b> Bé chóng mặt, vã mồ hôi, đau chói. <br> ➔ <b>Xử trí:</b> Cho nằm đầu cao, kiểm tra sinh hiệu, thử lại sau 1-2 giờ.',
+                criteria2: '<b>Tiêu chuẩn đạt:</b> Bé không chóng mặt, đau ở mức độ chịu đựng được.'
+            },
+            {
+                hour: 6,
+                title: 'UỐNG NƯỚC ĐƯỜNG',
+                details: `Cho bé uống <b>${(weightInput * 2).toFixed(0)} ml</b> đến <b>${(weightInput * 3).toFixed(0)} ml</b> nước đường (Liều: 2-3 ml/kg).`,
+                criteria1: '<b>Không đạt:</b> Bé nôn ói, chướng bụng. <br> ➔ <b>Xử trí:</b> Nhịn thêm 2 giờ, báo Bác sĩ, sau đó thử lại với liều thấp 1 ml/kg.',
+                criteria2: '<b>Tiêu chuẩn đạt:</b> Bé không nôn ói, không chướng bụng sau 2 giờ.'
+            },
+            {
+                hour: 8,
+                title: 'TẬP ĐI LẠI',
+                details: 'Dìu bé đi lại nhẹ nhàng trong phòng bệnh (3-5 phút).',
+                criteria1: '<b>Không đạt:</b> Bé đau nhiều, không dám bước đi. <br> ➔ <b>Xử trí:</b> Nằm nghỉ, xem xét thêm thuốc giảm đau, động viên và thử lại sau 2 giờ.',
+                criteria2: '<b>Tiêu chuẩn đạt:</b> Bé đi được 2-3 vòng, không kiệt sức. <br> ➔ Khuyến khích duy trì đi lại 3-4 lần/ngày.'
+            },
+            {
+                hour: 12,
+                title: 'BẮT ĐẦU UỐNG SỮA',
+                details: `Bắt đầu cho uống <b>${(weightInput * 2).toFixed(0)} ml</b> đến <b>${(weightInput * 3).toFixed(0)} ml sữa/giờ</b> (Liều: 2-3 ml/kg/giờ). Có thể gộp cữ 2-3 giờ/lần.`,
+                criteria1: '<b>Không đạt:</b> Bé nôn sữa hoặc chướng bụng. <br> ➔ <b>Xử trí:</b> Quay lại bước uống nước đường, duy trì truyền dịch, thử lại sữa sau 4 giờ.',
+                criteria2: '<b>Tiêu chuẩn đạt:</b> Không nôn trong 2 cữ liên tiếp. <br> ➔ Tăng dần lượng sữa theo nhu cầu, có thể chuyển ăn cháo loãng.'
+            }
+        ];
+
+        let htmlContent = '';
+        steps.forEach(step => {
+            htmlContent += `
+                <div class="card">
+                    <div class="time">Mốc ${step.hour} giờ: ${addHours(baseTime, step.hour)}</div>
+                    <div class="title">${step.title}</div>
+                    <div class="details">${step.details}</div>
+                    <div class="criteria-fail">❌ ${step.criteria1}</div>
+                    <div class="criteria-success">✅ ${step.criteria2}</div>
+                </div>
+            `;
+        });
+
+        outputDiv.innerHTML = htmlContent;
+        document.getElementById('result-container').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
